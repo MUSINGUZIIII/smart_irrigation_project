@@ -1,0 +1,200 @@
+{% extends 'irrigation/base.html' %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    .contact-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .social-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    .social-icon:hover {
+        transform: scale(1.1);
+    }
+    .contact-method {
+        transition: all 0.3s ease;
+    }
+    .contact-method:hover {
+        background-color: #f0fdf4;
+    }
+    .whatsapp-icon {
+        background-color: #25D366;
+        color: #fff;
+    }
+    .whatsapp-icon:hover {
+        background-color: #128C7E;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Get In Touch With Us</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <!-- Contact Information -->
+        <div class="space-y-8">
+            <div class="bg-white p-8 rounded-xl shadow-md contact-card">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Contact Information</h2>
+
+                <div class="space-y-6">
+                    <!-- WhatsApp -->
+                    <div class="flex items-start contact-method p-4 rounded-lg">
+                        <div class="bg-green-100 p-3 rounded-full mr-4">
+                            <i class="fab fa-whatsapp text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">WhatsApp</h3>
+                            <a href="https://wa.me/+256782410318" class="text-green-600 hover:text-green-800 text-lg font-medium block mt-1">
+                                +256 782 410318
+                            </a>
+                            <p class="text-sm text-gray-500 mt-1">Message us anytime</p>
+                            <button onclick="copyPhoneNumber()"
+                                    class="mt-2 text-xs bg-green-100 hover:bg-green-200 px-2 py-1 rounded text-green-700">
+                                <i class="far fa-copy mr-1"></i> Copy Number
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="flex items-start contact-method p-4 rounded-lg">
+                        <div class="bg-green-100 p-3 rounded-full mr-4">
+                            <i class="fas fa-envelope text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">Email Us</h3>
+                            <a href="mailto:smartirrigation007@gmail.com" class="text-green-600 hover:text-green-800 text-lg font-medium block mt-1">
+                                smartirrigation007@gmail.com
+                            </a>
+                            <p class="text-sm text-gray-500 mt-1">We'll respond within 24 hours</p>
+                            <button onclick="copyEmail()"
+                                    class="mt-2 text-xs bg-green-100 hover:bg-green-200 px-2 py-1 rounded text-green-700">
+                                <i class="far fa-copy mr-1"></i> Copy Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Section -->
+    <div class="bg-white p-8 rounded-xl shadow-md mb-8">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Connect With Us</h2>
+
+        <div class="flex flex-wrap justify-center gap-6">
+            <!-- WhatsApp -->
+            <a href="https://wa.me/+256782410318" target="_blank"
+               class="social-icon whatsapp-icon">
+                <i class="fab fa-whatsapp text-2xl"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Copy phone number functionality
+function copyPhoneNumber() {
+    const phoneNumber = '+256782410318';
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(phoneNumber).then(() => {
+            showCopySuccess('Phone number copied!');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            fallbackCopyText(phoneNumber);
+        });
+    } else {
+        fallbackCopyText(phoneNumber);
+    }
+}
+
+// Copy email functionality
+function copyEmail() {
+    const email = 'smartirrigation007@gmail.com';
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(email).then(() => {
+            showCopySuccess('Email copied!');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            fallbackCopyText(email);
+        });
+    } else {
+        fallbackCopyText(email);
+    }
+}
+
+function fallbackCopyText(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showCopySuccess('Copied to clipboard!');
+        } else {
+            showCopyError();
+        }
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        showCopyError();
+    } finally {
+        document.body.removeChild(textarea);
+    }
+}
+
+function showCopySuccess(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center';
+    toast.innerHTML = `
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        ${message}
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function showCopyError() {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center';
+    toast.innerHTML = `
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        Failed to copy. Please copy manually.
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Update the buttons to use the proper functions
+document.addEventListener('DOMContentLoaded', function() {
+    const copyPhoneButton = document.querySelector('[onclick="copyPhoneNumber()"]');
+    if (copyPhoneButton) {
+        copyPhoneButton.onclick = copyPhoneNumber;
+    }
+
+    const copyEmailButton = document.querySelector('[onclick="copyEmail()"]');
+    if (copyEmailButton) {
+        copyEmailButton.onclick = copyEmail;
+    }
+});
+</script>
+{% endblock %}

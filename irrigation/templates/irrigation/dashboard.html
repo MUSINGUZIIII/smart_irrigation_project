@@ -1,0 +1,841 @@
+{% extends 'irrigation/base.html' %}
+{% load static %}
+
+{% block title %}Smart Irrigation Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Dashboard Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-green-800">Smart Irrigation Dashboard</h1>
+            <p class="text-green-600 mt-2">Real-time monitoring of your irrigation system</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex space-x-3">
+            <!-- Tank Configuration Button -->
+            <button onclick="showTankConfigModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Configure Tank
+            </button>
+            <a href="{% url 'water-usage' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                Water Usage Analytics
+            </a>
+        </div>
+    </div>
+
+    <!-- Tank Configuration Modal -->
+    <div id="tankConfigModal" class="fixed z-20 inset-0 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-purple-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                Configure Water Tank
+                            </h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tank Volume (liters)</label>
+                                    <input type="number" id="tank-volume-input" step="0.1" min="0.1" value="0.3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <p class="text-xs text-gray-500 mt-1">Default: 0.3L (300ml cup)</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tank Height (cm)</label>
+                                    <input type="number" id="tank-height-input" step="0.5" min="1" value="10" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <p class="text-xs text-gray-500 mt-1">Default: 10cm (typical cup height)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="saveTankConfig()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Save Configuration
+                    </button>
+                    <button type="button" onclick="hideTankConfigModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards Row 1 -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Soil Moisture Card -->
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Soil Moisture</p>
+                    <p class="text-2xl font-semibold text-gray-800" id="current-moisture">
+                        {% if sensor_data.0.moisture %}
+                            {{ sensor_data.0.moisture|floatformat:1 }}%
+                        {% else %}
+                            --
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-2">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-yellow-500 h-2 rounded-full" style="width: {% if sensor_data.0.moisture %}{{ sensor_data.0.moisture }}{% else %}0{% endif %}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pump Status Card -->
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Pump Status</p>
+                    <p class="text-2xl font-semibold text-gray-800" id="pump-status-display">
+                        {% if sensor_data.0.pump_status %}ON{% else %}OFF{% endif %}
+                    </p>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2" id="pump-last-updated">Last updated: {{ sensor_data.0.timestamp|date:"H:i" }}</p>
+        </div>
+
+        <!-- Current Tank Level Card -->
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-cyan-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Tank Level</p>
+                    <p class="text-2xl font-semibold text-gray-800" id="tank-level">--%</p>
+                </div>
+                <div class="p-3 rounded-full bg-cyan-100 text-cyan-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2" id="tank-volume">Volume: -- L</p>
+        </div>
+
+        <!-- Today's Water Usage Card -->
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Today's Usage</p>
+                    <p class="text-2xl font-semibold text-gray-800" id="today-usage">-- L</p>
+                </div>
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2" id="usage-period">Last 24 hours</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards Row 2 - Water Usage Details -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Weekly Usage Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-md font-semibold text-gray-700">Weekly Usage</h3>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <p class="text-2xl font-bold text-gray-800" id="weekly-usage">-- L</p>
+                    <p class="text-xs text-gray-500">Last 7 days</p>
+                </div>
+                <div class="text-sm text-gray-600" id="weekly-avg">-- L/day avg</div>
+            </div>
+        </div>
+
+        <!-- Monthly Usage Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-md font-semibold text-gray-700">Monthly Usage</h3>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <p class="text-2xl font-bold text-gray-800" id="monthly-usage">-- L</p>
+                    <p class="text-xs text-gray-500">Last 30 days</p>
+                </div>
+                <div class="text-sm text-gray-600" id="monthly-avg">-- L/day avg</div>
+            </div>
+        </div>
+
+        <!-- Largest Usage Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-md font-semibold text-gray-700">Largest Usage</h3>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <p class="text-2xl font-bold text-gray-800" id="max-usage">-- L</p>
+                    <p class="text-xs text-gray-500" id="max-usage-date">--</p>
+                </div>
+                <div class="text-sm text-gray-600" id="max-usage-period">-- min</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Water Usage Chart -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Water Usage Trend (Last 7 Days) - EAT Timezone</h2>
+            <div class="flex space-x-2">
+                <button onclick="refreshWaterData()" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                </button>
+                <a href="{% url 'water-usage' %}" class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-colors">
+                    View Details
+                </a>
+            </div>
+        </div>
+        <div class="chart-container" style="height: 250px;">
+            <canvas id="miniUsageChart"></canvas>
+        </div>
+    </div>
+
+    <!-- System Status Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Pump Status Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Pump Status</h3>
+                <span class="px-3 py-1 rounded-full text-xs font-medium {% if sensor_data.0.pump_status %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}" id="pump-status-badge">
+                    {{ sensor_data.0.pump_status|yesno:"ON,OFF" }}
+                </span>
+            </div>
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center {% if sensor_data.0.pump_status %}bg-green-100 text-green-600{% else %}bg-gray-100 text-gray-600{% endif %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-600">Current pump is {% if sensor_data.0.pump_status %}running{% else %}stopped{% endif %}</p>
+                    <p class="text-xs text-gray-500">Last updated: <span id="pump-timestamp">{{ sensor_data.0.timestamp|date:"M d, H:i" }}</span></p>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-100">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Total Run Time (Today):</span>
+                    <span class="font-medium text-gray-800" id="pump-runtime">-- min</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Water Tank Status Card -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Water Tank Status</h3>
+                <span class="px-3 py-1 rounded-full text-xs font-medium" id="tank-status-badge">Loading...</span>
+            </div>
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-cyan-100 text-cyan-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">Water Level</span>
+                        <span class="text-sm font-medium text-gray-800" id="tank-percentage">--%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-cyan-600 h-2.5 rounded-full" id="tank-level-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 text-xs text-gray-500">
+                        <span>Empty</span>
+                        <span id="tank-volume-display">-- L / -- L</span>
+                        <span>Full</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Water Usage Events -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800">Recent Water Usage Events (EAT Timezone)</h2>
+            <a href="{% url 'water-usage' %}" class="text-sm text-blue-600 hover:text-blue-800">View All →</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date (EAT)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time (EAT)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Water Used</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Initial</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Final</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period (min)</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-usage-table" class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            <div class="flex justify-center">
+                                <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="ml-2">Loading water usage data...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sensor Data Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800">Recent Sensor Data</h2>
+            <div class="flex space-x-3">
+                <button onclick="showDownloadModal('csv')" class="text-sm bg-green-50 hover:bg-green-100 text-green-700 py-2 px-3 rounded-md transition-colors flex items-center border border-green-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    CSV
+                </button>
+                <button onclick="showDownloadModal('excel')" class="text-sm bg-green-50 hover:bg-green-100 text-green-700 py-2 px-3 rounded-md transition-colors flex items-center border border-green-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Excel
+                </button>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp (EAT)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moisture (%)</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pump</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for data in sensor_data %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800" id="timestamp-{{ forloop.counter }}">{{ data.timestamp|date:"M d, Y H:i:s" }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ data.moisture }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if data.pump_status %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ data.pump_status|yesno:"ON,OFF" }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="px-6 py-3 bg-gray-50 text-right text-sm text-gray-600">
+            Showing last {{ sensor_data|length }} records
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <a href="{% url 'control-panel' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-800">Manual Control</h3>
+                    <p class="text-sm text-gray-600">Override settings</p>
+                </div>
+            </a>
+            <a href="{% url 'visualize-data' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-800">Analytics</h3>
+                    <p class="text-sm text-gray-600">View insights</p>
+                </div>
+            </a>
+            <a href="{% url 'water-usage' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex-shrink-0 w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-800">Water Usage</h3>
+                    <p class="text-sm text-gray-600">Track consumption</p>
+                </div>
+            </a>
+            <a href="{% url 'control-panel' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex-shrink-0 w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-800">Schedule</h3>
+                    <p class="text-sm text-gray-600">Set timers</p>
+                </div>
+            </a>
+
+            <a href="{% url 'irrigation-frequency' %}" class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-medium text-gray-800">Irrigation Frequency</h3>
+                    <p class="text-sm text-gray-600">Analyze patterns & plan ahead</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Download Confirmation Modal -->
+<div id="downloadModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="downloadModalTitle">
+                            Confirm Download
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500" id="downloadModalMessage">
+                                Are you sure you want to download the sensor data in <span id="downloadFormat" class="font-medium">CSV</span> format?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="confirmDownload()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Download
+                </button>
+                <button type="button" onclick="hideDownloadModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Global variables
+    let currentDownloadFormat = 'csv';
+    let miniChart = null;
+
+    // Tank configuration (default: 0.3L cup, 10cm height)
+    let tankConfig = {
+        volume: 0.3,  // liters (300ml)
+        height: 10    // cm
+    };
+
+    // East African Time timezone (UTC+3)
+    const EAT_TIMEZONE = 'Africa/Nairobi';
+
+    // Load saved tank configuration from localStorage
+    function loadTankConfig() {
+        const saved = localStorage.getItem('tankConfig');
+        if (saved) {
+            try {
+                tankConfig = JSON.parse(saved);
+                document.getElementById('tank-volume-input').value = tankConfig.volume;
+                document.getElementById('tank-height-input').value = tankConfig.height;
+            } catch (e) {
+                console.error('Error loading tank config:', e);
+            }
+        }
+    }
+
+    // Save tank configuration to localStorage
+    function saveTankConfig() {
+        const volume = parseFloat(document.getElementById('tank-volume-input').value);
+        const height = parseFloat(document.getElementById('tank-height-input').value);
+
+        if (volume > 0 && height > 0) {
+            tankConfig = { volume, height };
+            localStorage.setItem('tankConfig', JSON.stringify(tankConfig));
+            hideTankConfigModal();
+            showToast('Tank configuration saved!', 'success');
+            loadCurrentTankLevel(); // Refresh display with new config
+        } else {
+            showToast('Please enter valid values', 'error');
+        }
+    }
+
+    // Show tank configuration modal
+    function showTankConfigModal() {
+        document.getElementById('tank-volume-input').value = tankConfig.volume;
+        document.getElementById('tank-height-input').value = tankConfig.height;
+        document.getElementById('tankConfigModal').classList.remove('hidden');
+    }
+
+    // Hide tank configuration modal
+    function hideTankConfigModal() {
+        document.getElementById('tankConfigModal').classList.add('hidden');
+    }
+
+    // Format date to EAT timezone
+    function formatDateToEAT(timestamp) {
+        const date = new Date(timestamp);
+        // EAT is UTC+3, so add 3 hours
+        const eatDate = new Date(date.getTime());
+
+        return {
+            date: eatDate.toISOString().split('T')[0],
+            time: eatDate.toTimeString().split(' ')[0].substring(0, 5) // HH:MM format
+        };
+    }
+
+    // Convert all timestamps on the page to EAT
+    function convertTimestampsToEAT() {
+        document.querySelectorAll('[id^="timestamp-"]').forEach(element => {
+            const originalText = element.textContent;
+            const originalDate = new Date(originalText);
+            const eatFormatted = formatDateToEAT(originalDate);
+            element.textContent = `${eatFormatted.date} ${eatFormatted.time}`;
+        });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTankConfig();
+        loadWaterUsageData();
+        loadCurrentTankLevel();
+        convertTimestampsToEAT();
+
+        // Refresh data every 30 seconds
+        setInterval(function() {
+            loadWaterUsageData(true);
+            loadCurrentTankLevel();
+        }, 30000);
+    });
+
+    // Load water usage data
+    function loadWaterUsageData(silent = false) {
+        fetch('/api/water-usage/history/?days=7')
+            .then(response => response.json())
+            .then(data => {
+                updateWaterStats(data);
+                updateRecentEvents(data.records);
+                updateMiniChart(data.records);
+            })
+            .catch(error => {
+                console.error('Error loading water usage:', error);
+                if (!silent) {
+                    showToast('Error loading water usage data', 'error');
+                }
+            });
+    }
+
+    // Load current tank level
+    function loadCurrentTankLevel() {
+        fetch('/api/tank-level/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.level_percentage !== null) {
+                    document.getElementById('tank-level').textContent = data.level_percentage.toFixed(1) + '%';
+
+                    // Calculate volume based on configured tank capacity
+                    const volumeInTank = (data.level_percentage / 100) * tankConfig.volume;
+                    document.getElementById('tank-volume').textContent = `Volume: ${volumeInTank.toFixed(2)} L / ${tankConfig.volume.toFixed(1)} L`;
+                    document.getElementById('tank-percentage').textContent = data.level_percentage.toFixed(1) + '%';
+                    document.getElementById('tank-level-bar').style.width = data.level_percentage + '%';
+                    document.getElementById('tank-volume-display').textContent = `${volumeInTank.toFixed(2)} L / ${tankConfig.volume.toFixed(1)} L`;
+
+                    // Calculate height based on configured tank height
+                    const heightInTank = (data.level_percentage / 100) * tankConfig.height;
+
+                    // Update status badge
+                    const badge = document.getElementById('tank-status-badge');
+                    if (data.level_percentage < 10) {
+                        badge.textContent = 'CRITICAL';
+                        badge.className = 'px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800';
+                    } else if (data.level_percentage < 20) {
+                        badge.textContent = 'LOW';
+                        badge.className = 'px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800';
+                    } else if (data.level_percentage < 50) {
+                        badge.textContent = 'MODERATE';
+                        badge.className = 'px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800';
+                    } else {
+                        badge.textContent = 'GOOD';
+                        badge.className = 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                    }
+
+                    // Format timestamp in EAT
+                    if (data.timestamp) {
+                        const eatFormatted = formatDateToEAT(data.timestamp);
+                        document.getElementById('tank-updated').textContent =
+                            `${eatFormatted.date} ${eatFormatted.time}`;
+                    }
+                }
+            })
+            .catch(error => console.error('Error loading tank level:', error));
+    }
+
+    // Update water statistics
+    function updateWaterStats(data) {
+        const records = data.records || [];
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+
+        // Calculate today's usage
+        let todayUsage = 0;
+        records.forEach(record => {
+            const eatFormatted = formatDateToEAT(record.timestamp);
+            if (eatFormatted.date === today) {
+                todayUsage += record.volume_used;
+            }
+        });
+        document.getElementById('today-usage').textContent = todayUsage.toFixed(2) + ' L';
+
+        // Weekly usage
+        document.getElementById('weekly-usage').textContent = data.total_usage.toFixed(2) + ' L';
+        document.getElementById('weekly-avg').textContent = data.average_daily_usage.toFixed(2) + ' L/day';
+
+        // Monthly usage (last 30 days)
+        fetch('/api/water-usage/history/?days=30')
+            .then(response => response.json())
+            .then(monthlyData => {
+                document.getElementById('monthly-usage').textContent = monthlyData.total_usage.toFixed(2) + ' L';
+                document.getElementById('monthly-avg').textContent = monthlyData.average_daily_usage.toFixed(2) + ' L/day';
+            })
+            .catch(error => console.error('Error loading monthly data:', error));
+
+        // Find largest usage
+        if (records.length > 0) {
+            const maxRecord = records.reduce((max, r) => r.volume_used > max.volume_used ? r : max, records[0]);
+            const eatFormatted = formatDateToEAT(maxRecord.timestamp);
+            const periodMinutes = (maxRecord.measurement_period_hours * 60).toFixed(1);
+
+            document.getElementById('max-usage').textContent = maxRecord.volume_used.toFixed(2) + ' L';
+            document.getElementById('max-usage-date').textContent = eatFormatted.date;
+            document.getElementById('max-usage-period').textContent = periodMinutes + ' min';
+        }
+    }
+
+    // Update recent events table
+    function updateRecentEvents(records) {
+        const tbody = document.getElementById('recent-usage-table');
+
+        if (!records || records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No water usage records found</td></tr>';
+            return;
+        }
+
+        // Show only the 5 most recent records
+        const recent = records.slice(0, 5);
+        let html = '';
+
+        recent.forEach(record => {
+            const eatFormatted = formatDateToEAT(record.timestamp);
+            const periodMinutes = (record.measurement_period_hours * 60).toFixed(1);
+
+            html += `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${eatFormatted.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${eatFormatted.time}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">${record.volume_used.toFixed(2)} L</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${record.initial_volume.toFixed(2)} L</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${record.final_volume.toFixed(2)} L</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${periodMinutes} min</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+    }
+
+    // Update mini chart
+    function updateMiniChart(records) {
+        const ctx = document.getElementById('miniUsageChart').getContext('2d');
+
+        if (!records || records.length === 0) {
+            return;
+        }
+
+        // Group by date (using EAT dates)
+        const usageByDate = {};
+        records.forEach(record => {
+            const eatFormatted = formatDateToEAT(record.timestamp);
+            const date = eatFormatted.date;
+
+            if (!usageByDate[date]) {
+                usageByDate[date] = 0;
+            }
+            usageByDate[date] += record.volume_used;
+        });
+
+        const labels = Object.keys(usageByDate).sort();
+        const values = labels.map(date => usageByDate[date]);
+
+        // Destroy existing chart if it exists
+        if (miniChart) {
+            miniChart.destroy();
+        }
+
+        // Create new chart
+        miniChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Water Used (L)',
+                    data: values,
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointBackgroundColor: '#0284c7',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Water Used: ${context.raw.toFixed(2)} L`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(229, 231, 235, 0.5)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Download functions
+    function showDownloadModal(format) {
+        currentDownloadFormat = format;
+        document.getElementById('downloadFormat').textContent = format.toUpperCase();
+        document.getElementById('downloadModal').classList.remove('hidden');
+    }
+
+    function hideDownloadModal() {
+        document.getElementById('downloadModal').classList.add('hidden');
+    }
+
+    function confirmDownload() {
+        hideDownloadModal();
+        window.location.href = `{% url 'download-data' %}?format=${currentDownloadFormat}`;
+    }
+
+    // Refresh water data
+    function refreshWaterData() {
+        showToast('Refreshing data...', 'info');
+        loadWaterUsageData();
+    }
+
+    // Toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-lg text-white ${
+            type === 'error' ? 'bg-red-500' :
+            type === 'success' ? 'bg-green-500' :
+            'bg-blue-500'
+        } z-50`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('downloadModal');
+        const tankModal = document.getElementById('tankConfigModal');
+
+        if (event.target === modal) {
+            hideDownloadModal();
+        }
+        if (event.target === tankModal) {
+            hideTankConfigModal();
+        }
+    });
+</script>
+{% endblock %}

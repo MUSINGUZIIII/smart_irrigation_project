@@ -1,0 +1,200 @@
+{% extends 'irrigation/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="relative min-h-screen flex flex-col">
+    <!-- Hero Section with Full Screen Background -->
+    <div class="relative flex-grow flex items-center justify-center overflow-hidden">
+        <!-- Background image - covers full interface -->
+        <div class="absolute inset-0 z-0">
+            <img src="{% static 'irrigation/images/irrigation_system_view.png' %}" alt="Background" class="w-full h-full object-cover object-center">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
+        </div>
+
+        <!-- Content - centered vertically and horizontally -->
+        <div class="relative z-10 text-center text-white container mx-auto px-4 py-12 md:py-20">
+            <div class="max-w-4xl mx-auto">
+                <!-- Animated Icon -->
+                <div class="mb-8 animate-bounce-slow">
+                    <i class="fas fa-water text-6xl md:text-7xl text-green-400 opacity-90"></i>
+                </div>
+
+                <!-- Main Heading with Animation -->
+                <h1 class="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in-up">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-300 via-white to-green-300">
+                        Welcome to Smart Irrigation System
+                    </span>
+                </h1>
+
+                <!-- Subheading with Animation -->
+                <p class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-3xl mx-auto text-gray-100 animate-fade-in-up animation-delay-200">
+                    Revolutionizing agriculture with smart technology that saves water, time, and resources while maximizing crop yield.
+                </p>
+
+                <!-- Conditional Content with Animation -->
+                <div class="animate-fade-in-up animation-delay-400">
+                    {% if user.is_authenticated %}
+                        <p class="text-2xl mb-8 text-green-200">Welcome back, {{ user.username }}!</p>
+                        <a href="{% url 'dashboard' %}" class="inline-flex items-center bg-white text-green-800 hover:bg-green-50 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group">
+                            <span>Go to Dashboard</span>
+                            <i class="ml-2 fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+                        </a>
+                    {% else %}
+                        <p class="text-xl mb-8 text-gray-200">Get started with smart irrigation today.</p>
+                        <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                            <a href="{% url 'login' %}" class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group border-2 border-transparent hover:border-green-400">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                <span>Login</span>
+                            </a>
+                            <a href="{% url 'register' %}" class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg text-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group border-2 border-transparent hover:border-emerald-400">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                <span>Register</span>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Scroll Indicator -->
+                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce hidden md:block">
+                    <div class="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+                        <div class="w-1 h-3 bg-white rounded-full mt-2 animate-scroll"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ensure full coverage */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Custom animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bounceSlow {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes scrollIndicator {
+        0% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        75% {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 0;
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 1s ease-out forwards;
+        opacity: 0;
+    }
+
+    .animate-bounce-slow {
+        animation: bounceSlow 3s ease-in-out infinite;
+    }
+
+    .animate-scroll {
+        animation: scrollIndicator 2s ease-in-out infinite;
+    }
+
+    /* Animation delays */
+    .animation-delay-200 {
+        animation-delay: 0.2s;
+    }
+
+    .animation-delay-400 {
+        animation-delay: 0.4s;
+    }
+
+    .animation-delay-600 {
+        animation-delay: 0.6s;
+    }
+
+    /* Text gradient animation */
+    .bg-gradient-to-r {
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+    }
+
+    /* Ensure the hero section takes full height */
+    .min-h-screen {
+        min-height: 100vh;
+    }
+
+    /* Responsive text adjustments */
+    @media (max-width: 640px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+        p {
+            font-size: 1.1rem;
+        }
+    }
+
+    /* Smooth hover effects */
+    .group:hover .group-hover\:translate-x-2 {
+        transform: translateX(0.5rem);
+    }
+
+    /* Glass morphism effect for buttons on hover */
+    .hover\:shadow-2xl:hover {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Ensure image covers properly on all devices */
+    .object-cover {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+
+    .object-center {
+        object-position: center;
+    }
+
+    /* Gradient overlay animation */
+    .bg-gradient-to-b {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.7));
+    }
+</style>
+{% endblock %}

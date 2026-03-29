@@ -1,0 +1,24 @@
+{% extends 'irrigation/base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <h2 class="text-blue-500 text-2xl font-bold mb-4">Register</h2>
+    <form method="post" enctype="multipart/form-data" class="text-green-500 space-y-4">
+        {% csrf_token %}
+        {% for field in form %}
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <span class="text-red-500">{{ field.errors|join:", " }}</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="w-full bg-yellow-300 text-blue font-bold px-4 py-2 rounded">Register</button>
+    </form>
+    <div class="mt-4 text-center">
+        <p>Already have an account? <a href="{% url 'login' %}" class="text-blue-500">Login here</a></p>
+    </div>
+</div>
+{% endblock %}
+

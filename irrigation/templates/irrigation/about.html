@@ -1,0 +1,103 @@
+{% extends 'irrigation/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <!-- Hero Section -->
+    <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-bold text-green-700 mb-6">Smart Irrigation System</h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Revolutionizing agriculture through smart water management and sustainable technology
+        </p>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <!-- System Description -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+            <div class="p-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-green-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-leaf text-green-600 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">About Our System</h2>
+                </div>
+
+                <p class="mb-6 text-gray-600 leading-relaxed">
+                    The smart Irrigation System is an award-winning smart solution that combines IoT sensors to optimize water usage in agriculture. Designed specifically for Uganda's climate,
+                    our system ensures crops receive precise irrigation while conserving precious water resources.
+                </p>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-green-700">Key Features:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-tint text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800 mb-2">Real-time Monitoring</h4>
+                                <p class="text-sm text-gray-500">Soil moisture</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-robot text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800 mb-2">Smart Automation</h4>
+                                <p class="text-sm text-gray-500">Weather-adaptive scheduling</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-mobile-alt text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800 mb-2">Remote Control</h4>
+                                <p class="text-sm text-gray-500">Manage from anywhere via mobile</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-chart-line text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-800 mb-2">Data Analytics</h4>
+                                <p class="text-sm text-gray-500">Detailed water usage reports</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Technology -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
+            <div class="p-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                        <i class="fas fa-microchip text-blue-600 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Technology & Innovation</h2>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="font-semibold text-lg text-gray-800 mb-3">Advanced Components</h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <div class="flex items-start">
+                                <i class="fas fa-sensor text-green-500 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">IoT Sensors</h4>
+                                    <p class="text-sm text-gray-500">Precision soil moisture monitoring</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-cloud text-green-500 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Cloud Platform</h4>
+                                    <p class="text-sm text-gray-500">Real-time data processing and remote management</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

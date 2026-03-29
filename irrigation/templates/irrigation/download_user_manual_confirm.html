@@ -1,0 +1,20 @@
+{% extends 'irrigation/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold mb-4">Download User Manual</h2>
+        <p class="mb-6">Are you sure you want to download the user manual?</p>
+        <form method="post" action="{% url 'download_user_manual' %}" class="flex justify-between">
+            {% csrf_token %}
+            <button type="submit" name="confirm" value="yes" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                Yes, Download
+            </button>
+            <button type="submit" name="confirm" value="no" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                No, Cancel
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

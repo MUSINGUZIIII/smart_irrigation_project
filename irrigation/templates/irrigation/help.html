@@ -1,0 +1,86 @@
+{% extends 'irrigation/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Help & Support Center</h1>
+
+    <!-- Download Manual Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-semibold text-gray-700">User Manual</h2>
+            <a href="{% url 'download_user_manual' %}"
+               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download User Manual
+            </a>
+        </div>
+        <p class="text-gray-600">Get the complete guide to using our Intelligent Irrigation System. The manual includes setup instructions, troubleshooting tips, and best practices.</p>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Frequently Asked Questions</h2>
+        <div class="space-y-4">
+            <div class="border-b border-gray-200 pb-4">
+                <h3 class="text-lg font-medium text-gray-800">How often should I water my plants?</h3>
+                <p class="mt-1 text-gray-600">Our system automatically adjusts watering schedules based on soil moisture levels, weather forecasts, and plant requirements. You can monitor the schedule in the Control Panel.</p>
+            </div>
+            <div class="border-b border-gray-200 pb-4">
+                <h3 class="text-lg font-medium text-gray-800">Can I manually override the automated system?</h3>
+                <p class="mt-1 text-gray-600">Yes, you can switch to manual mode in the Control Panel to activate or deactivate irrigation as needed. The system will return to automatic mode after 2 hours unless you specify otherwise.</p>
+            </div>
+            <div class="border-b border-gray-200 pb-4">
+                <h3 class="text-lg font-medium text-gray-800">How do I interpret the sensor data?</h3>
+                <p class="mt-1 text-gray-600">The Visualize Data page provides interactive graphs showing soil moisture (optimal range 20-40%), temperature, and humidity. Green indicators mean values are in optimal range, while red indicates attention is needed.</p>
+            </div>
+            <div>
+                <h3 class="text-lg font-medium text-gray-800">What should I do in case of an emergency?</h3>
+                <p class="mt-1 text-gray-600">Use the Emergency Stop button in the Control Panel to immediately halt all irrigation. Contact support if the issue persists.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Support Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Contact Support</h2>
+        <form method="post" action="{% url 'help' %}" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input type="text" id="name" name="name" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" name="email" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+            </div>
+            <div>
+                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                <textarea id="message" name="message" rows="4" required
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"></textarea>
+            </div>
+            <div>
+                <button type="submit"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors">
+                    Send Message
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+            <div class="flex">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+                <div>
+                    <h3 class="text-sm font-medium text-blue-800">Need immediate assistance?</h3>
+                    <p class="text-sm text-blue-700 mt-1">For urgent issues, please call our support line at +256780443345 or visit our <a href="{% url 'contact' %}" class="font-medium underline">contact page</a> for more options.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

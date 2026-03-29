@@ -1,0 +1,119 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #007BFF; /* Blue color for the heading */
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #555;
+            font-size: 1.5em;
+        }
+
+        p {
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            width: 90%;
+            max-width: 500px; /* Responsive max width for the form */
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007BFF; /* Blue background for buttons */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: background-color 0.3s ease; /* Smooth transition */
+            width: 100%; /* Full width for buttons */
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        .button-link {
+            background-color: #6c757d; /* Gray background for link button */
+            text-decoration: none; /* Remove underline */
+            color: white;
+            padding: 8px 12px; /* Reduced padding for smaller size */
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.3s ease; /* Smooth transition */
+            width: auto; /* Auto width for link button */
+        }
+
+        .button-link:hover {
+            background-color: #5a6268; /* Darker gray on hover */
+        }
+
+        /* Responsive typography */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            button, .button-link {
+                padding: 12px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Profile</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h2>User Information</h2>
+        {{ user_form.as_p }}
+
+        <h2>Profile Information</h2>
+        {{ profile_form.as_p }}
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <p>
+        <a href="{% url 'profile' %}" class="button-link">Back to Profile</a>
+    </p>
+</body>
+</html>

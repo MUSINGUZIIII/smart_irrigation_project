@@ -1,0 +1,477 @@
+{% extends 'irrigation/base.html' %}
+{% load static %}
+
+{% block title %}Profile - Intelligent Irrigation System{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Profile Card -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <!-- Profile Information -->
+        <div class="pt-20 pb-8 px-6">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</h1>
+                <p class="text-sm font-bold text-gray-500">Member since {{ user.date_joined|date:"F j, Y" }}</p>
+                {% if user.phone_number %}
+                    <p class="text-sm font-bold text-gray-500 mt-2" id="phone-display">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        {{ user.phone_number }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Profile Update Form -->
+            <form method="post" enctype="multipart/form-data" id="profile-update-form" class="space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="profile_update">
+
+                <!-- Hidden file input -->
+                <input type="file"
+                       id="profile-picture-input"
+                       name="profile_picture"
+                       class="hidden"
+                       accept="image/*"
+                       capture="environment">
+
+                <!-- Personal Information Section -->
+                <div class="space-y-6">
+                    <h2 class="text-lg font-medium text-gray-900">Personal Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- First Name -->
+                        <div>
+                            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First Name</label>
+                            <input type="text"
+                                   id="{{ form.first_name.id_for_label }}"
+                                   name="{{ form.first_name.html_name }}"
+                                   value="{{ form.first_name.value|default:'' }}"
+                                   class="mt-1 text-gray-700 block w-full rounded-md border-gray-700 shadow-sm focus:border-green-700 focus:ring-gray-700">
+                            {% if form.first_name.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.first_name.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Last Name -->
+                        <div>
+                            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last Name</label>
+                            <input type="text"
+                                   id="{{ form.last_name.id_for_label }}"
+                                   name="{{ form.last_name.html_name }}"
+                                   value="{{ form.last_name.value|default:'' }}"
+                                   class="mt-1 block w-full text-gray-700 rounded-md border-gray-700 shadow-sm focus:border-gray-700 focus:ring-gray-700">
+                            {% if form.last_name.errors %}
+                                <p class="mt-1 text-sm  text-red-600">{{ form.last_name.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email"
+                                   id="{{ form.email.id_for_label }}"
+                                   name="{{ form.email.html_name }}"
+                                   value="{{ form.email.value|default:'' }}"
+                                   class="mt-1 text-gray-700 block w-full rounded-md border-gray-700 shadow-sm focus:border-gray-500 focus:ring-gray-500">
+                            {% if form.email.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.email.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div>
+                            <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                            <div class="mt-1 flex rounded-md shadow-sm">
+                                <span class="inline-flex items-center px-3 font-medium rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                    </svg>
+                                </span>
+                                <input type="tel"
+                                       id="{{ form.phone_number.id_for_label }}"
+                                       name="{{ form.phone_number.html_name }}"
+                                       value="{{ form.phone_number.value|default:'' }}"
+                                       placeholder="+[country code][number]"
+                                       class="focus:ring-gray-700 text-gray-700 focus:border-gray-700 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-700">
+                            </div>
+                            {% if form.phone_number.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.phone_number.errors|join:", " }}</p>
+                            {% endif %}
+                            <p class="mt-1 text-xs text-gray-700">Format: +[country code][number], e.g., +1234567890</p>
+                        </div>
+
+                        <!-- Location -->
+                        <div>
+                            <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700">Location</label>
+                            <input type="text"
+                                   id="{{ form.location.id_for_label }}"
+                                   name="{{ form.location.html_name }}"
+                                   value="{{ form.location.value|default:'' }}"
+                                   class="mt-1 block w-full text-gray-700 font-medium rounded-md border-gray-700 shadow-sm focus:border-green-500 focus:ring-ggray-700">
+                            {% if form.location.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.location.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Age -->
+                        <div>
+                            <label for="{{ form.age.id_for_label }}" class="block text-sm font-medium text-gray-700">Age</label>
+                            <input type="number"
+                                   id="{{ form.age.id_for_label }}"
+                                   name="{{ form.age.html_name }}"
+                                   value="{{ form.age.value|default:'' }}"
+                                   min="0"
+                                   class="mt-1 block w-full text-gray-700 font-medium rounded-md border-gray-700 shadow-sm focus:border-green-500 focus:ring-green-500">
+                            {% if form.age.errors %}
+                                <p class="mt-1 text-sm text-red-600">{{ form.age.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- SMS Alerts -->
+                        <div class="font-medium flex items-center">
+                            <input type="checkbox"
+                                   id="{{ form.receive_sms_alerts.id_for_label }}"
+                                   name="{{ form.receive_sms_alerts.html_name }}"
+                                   {% if form.receive_sms_alerts.value %}checked{% endif %}
+                                   class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <label for="{{ form.receive_sms_alerts.id_for_label }}" class="ml-2 block text-sm text-gray-700">
+                                Receive SMS Alerts
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Update Profile
+                    </button>
+                </div>
+            </form>
+
+            <!-- API Key Section -->
+            <div class="pt-6 border-t border-gray-200">
+                <h2 class="text-lg font-bold text-gray-900 mb-2">API Token</h2>
+                <p class="text-sm font-medium text-gray-500 mb-4">Use this token to authenticate with our API services.</p>
+
+                <div class="flex items-center">
+                    <div class="relative flex-1">
+                        <input type="password"
+                               id="api-token-display"
+                               value="{{ user.auth_token.key }}"
+                               readonly
+                               class="bg-gray-100 border border-gray-300 rounded-l-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-green-500 focus:border-green-500">
+                        <div id="api-token-mask" class="absolute inset-0 flex items-center px-3 pointer-events-none">
+                            <span class="text-gray-500">••••••••••••••</span>
+                        </div>
+                    </div>
+                    <button type="button"
+                            onclick="copyApiToken()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-r-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Copy
+                    </button>
+                    <a href="{% url 'confirm_token_regeneration' %}"
+                    class="ml-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Regenerate
+                    </a>
+                </div>
+                <p class="mt-2 font-medium text-xs text-gray-500">Keep your API token secure and don't share it publicly.</p>
+                <p class="mt-1 text-xs text-red-500">Warning: Regenerating will invalidate any devices using the current token.</p>
+            </div>
+
+            <!-- Account Management Section -->
+            <div class="mt-10 pt-6 border-t border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Account Management</h2>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'change_password' %}"
+                       class="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Change Password
+                    </a>
+                    <a href="{% url 'delete_account' %}"
+                       class="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Delete Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Message Toast -->
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+{% block extra_js %}
+<script>
+    // Copy API token to clipboard and reveal temporarily
+    function copyApiToken() {
+        const apiTokenInput = document.getElementById('api-token-display');
+        const apiTokenMask = document.getElementById('api-token-mask');
+
+        // Reveal the token
+        apiTokenMask.classList.add('hidden');
+        apiTokenInput.type = 'text';
+        apiTokenInput.select();
+
+        try {
+            document.execCommand('copy');
+            showToast('API token copied to clipboard!', 'success');
+        } catch (err) {
+            showToast('Failed to copy token', 'error');
+        }
+
+        // Hide the token again after 3 seconds
+        setTimeout(() => {
+            apiTokenInput.type = 'password';
+            apiTokenMask.classList.remove('hidden');
+        }, 3000);
+    }
+
+    // Profile picture options
+    function showOptions() {
+        document.getElementById('profile-picture-options').classList.remove('hidden');
+    }
+
+    function choosePicture(source) {
+        const input = document.getElementById('profile-picture-input');
+        input.removeAttribute('capture');
+
+        if (source === 'camera') {
+            input.setAttribute('capture', 'environment');
+        }
+
+        input.click();
+        closeOptions();
+    }
+
+    function closeOptions() {
+        document.getElementById('profile-picture-options').classList.add('hidden');
+    }
+
+    // Handle profile picture upload
+    const profilePictureInput = document.getElementById('profile-picture-input');
+
+    profilePictureInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+
+            // Validate file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('File size too large. Maximum size is 10MB.', 'error');
+                return;
+            }
+
+            // Validate file type
+            const validExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+            const ext = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+            if (!validExtensions.includes(ext)) {
+                showToast('Please select a valid image file (JPG, PNG, GIF).', 'error');
+                return;
+            }
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Update preview immediately
+                updateProfilePicturePreview(e.target.result);
+
+                // Submit the form
+                submitProfilePicture(file);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function updateProfilePicturePreview(imageUrl) {
+        const container = document.getElementById('profile-picture-container');
+
+        // Create and add new image with error handling
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Profile picture preview';
+        img.className = 'w-full h-full object-cover';
+        img.onerror = function() {
+            // If image fails to load, show default avatar
+            this.style.display = 'none';
+            const fallback = document.createElement('div');
+            fallback.className = 'w-full h-full flex items-center justify-center bg-gray-100';
+            fallback.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            `;
+            container.appendChild(fallback);
+        };
+
+        // Remove existing content and add new image
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+        container.appendChild(img);
+    }
+
+
+    function checkProfilePictureStatus() {
+        fetch("{% url 'check_profile_picture' %}", {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Profile picture status:', data);
+            if (data.has_profile_picture && data.profile_picture_url) {
+                // Check if the URL has double extensions
+                if (hasDoubleExtension(data.profile_picture_url)) {
+                    console.log('Double extension detected, fixing URL');
+                    const fixedUrl = fixDoubleExtension(data.profile_picture_url);
+                    updateProfilePicturePreview(fixedUrl);
+                } else {
+                    updateProfilePicturePreview(data.profile_picture_url);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error checking profile picture status:', error);
+        });
+    }
+
+    function hasDoubleExtension(url) {
+        // Check for patterns like .jpg.jpg, .png.png, etc.
+        const doubleExtensionPattern = /\.(jpg|jpeg|png|gif)\.(jpg|jpeg|png|gif)$/i;
+        return doubleExtensionPattern.test(url);
+    }
+
+    function fixDoubleExtension(url) {
+        // Fix double extensions by removing the duplicate
+        const urlObj = new URL(url);
+        const pathname = urlObj.pathname;
+
+        // Remove duplicate extensions
+        const fixedPathname = pathname.replace(
+            /\.(jpg|jpeg|png|gif)\.(jpg|jpeg|png|gif)$/i,
+            '.$2' // Keep only the last extension
+        );
+
+        urlObj.pathname = fixedPathname;
+        return urlObj.toString();
+    }
+
+    // Check status on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkProfilePictureStatus();
+    });
+
+
+    function submitProfilePicture(file) {
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        formData.append('form_type', 'profile_picture_only');
+
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || 'Network response was not ok');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+            if (data.status === 'success') {
+                showToast('Profile picture updated successfully', 'success');
+                if (data.profile_picture_url) {
+                    console.log('Received URL from server:', data.profile_picture_url);
+
+                    // Test the URL first
+                    testImageUrl(data.profile_picture_url, function(success) {
+                        if (success) {
+                            updateProfilePicturePreview(data.profile_picture_url);
+                        } else {
+                            // If URL fails, try different variations
+                            const variations = [
+                                data.profile_picture_url + '.jpg',
+                                data.profile_picture_url + '.png',
+                                data.profile_picture_url.replace('/v1/', '/') + '.jpg',
+                                data.profile_picture_url.replace('/image/upload/v1/', '/image/upload/') + '.jpg'
+                            ];
+
+                            testImageVariations(variations, 0);
+                        }
+                    });
+                }
+            } else {
+                throw new Error(data.message || 'Error updating profile picture');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast(error.message || 'Error updating profile picture', 'error');
+        });
+    }
+
+    function testImageUrl(url, callback) {
+        const testImg = new Image();
+        testImg.onload = function() { callback(true); };
+        testImg.onerror = function() { callback(false); };
+        testImg.src = url;
+    }
+
+    function testImageVariations(variations, index) {
+        if (index >= variations.length) {
+            console.log('All URL variations failed');
+            return;
+        }
+
+        testImageUrl(variations[index], function(success) {
+            if (success) {
+                updateProfilePicturePreview(variations[index]);
+            } else {
+                testImageVariations(variations, index + 1);
+            }
+        });
+    }
+
+    // Add phone number formatting
+    document.getElementById('{{ form.phone_number.id_for_label }}').addEventListener('input', function(e) {
+        // Remove all non-digit and plus characters
+        let value = e.target.value.replace(/[^\d+]/g, '');
+
+        // Ensure only one plus at the start
+        if (value.indexOf('+') > 0) {
+            value = value.replace(/\+/g, '');
+            value = '+' + value;
+        }
+
+        // Update the input value
+        e.target.value = value;
+    });
+
+    // Toast notification system
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `mb-4 p-4 rounded-md text-white ${
+            type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        } transition-opacity duration-300`;
+        toast.textContent = message;
+
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+
+        // Fade out and remove after 3 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+</script>
+{% endblock %}
+{% endblock %}

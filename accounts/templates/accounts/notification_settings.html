@@ -1,0 +1,116 @@
+{% extends 'irrigation/base.html' %}
+{% load static %}
+
+{% block title %}Notification Settings - Irrigation System{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Notification Settings</h2>
+
+    <!-- Display messages -->
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="p-4 rounded-md {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200{% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200{% elif message.tags == 'warning' %}bg-yellow-50 text-yellow-800 border border-yellow-200{% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+        <h3 class="font-semibold text-yellow-800">⚠️ Important</h3>
+        <p class="mt-2 text-yellow-700">
+            SMS notifications are <strong>disabled by default</strong> for privacy and cost reasons.
+            Enable them only if you want to receive regular updates.
+        </p>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <div class="flex items-start space-x-3 p-4 border rounded-md {% if form.receive_sms_alerts.value %}border-green-200 bg-green-50{% else %}border-gray-200{% endif %}">
+            {{ form.receive_sms_alerts }}
+            <div>
+                <label for="{{ form.receive_sms_alerts.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Enable SMS Notifications
+                </label>
+                <p class="text-sm text-gray-500 mt-1">
+                    Receive irrigation alerts via SMS. Standard messaging rates may apply.
+                </p>
+            </div>
+        </div>
+
+        <div class="space-y-2 p-4 border border-gray-200 rounded-md {% if form.receive_sms_alerts.value %}opacity-100{% else %}opacity-50{% endif %}"
+             id="frequency-section">
+            <label for="{{ form.sms_notification_frequency.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                Notification Frequency
+            </label>
+            {{ form.sms_notification_frequency }}
+            <p class="text-sm text-gray-500">How often you want to receive SMS notifications (when enabled)</p>
+        </div>
+
+        <div class="flex space-x-4">
+            <button type="submit" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-200">
+                Save Preferences
+            </button>
+
+            {% if request.user.receive_sms_alerts %}
+            <form method="post" action="{% url 'send_test_sms' %}" class="flex-1">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                    Send Test SMS
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="mt-8 p-4 {% if request.user.receive_sms_alerts %}bg-green-50 border border-green-200{% else %}bg-gray-50 border border-gray-200{% endif %} rounded-md">
+        <h3 class="font-semibold {% if request.user.receive_sms_alerts %}text-green-800{% else %}text-gray-800{% endif %}">Current Settings:</h3>
+        <p class="mt-2 {% if request.user.receive_sms_alerts %}text-green-700{% else %}text-gray-700{% endif %}">
+            {% if request.user.receive_sms_alerts %}
+                ✅ Receiving SMS every {{ request.user.sms_notification_frequency }} seconds
+                {% if request.user.last_notification_sent %}
+                <br><span class="text-sm">Last sent: {{ request.user.last_notification_sent|timesince }} ago</span>
+                {% endif %}
+            {% else %}
+                ❌ SMS notifications disabled
+            {% endif %}
+        </p>
+    </div>
+
+    {% if request.user.receive_sms_alerts %}
+    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <h3 class="font-semibold text-blue-800">📱 Test Your Settings</h3>
+        <p class="mt-2 text-blue-700">
+            Click "Send Test SMS" to immediately receive a test message with current sensor data.
+            This helps verify your phone number and settings are working correctly.
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const smsCheckbox = document.getElementById('{{ form.receive_sms_alerts.id_for_label }}');
+    const frequencySection = document.getElementById('frequency-section');
+
+    function updateFrequencySection() {
+        if (smsCheckbox.checked) {
+            frequencySection.classList.remove('opacity-50');
+            frequencySection.querySelector('select').disabled = false;
+        } else {
+            frequencySection.classList.add('opacity-50');
+            frequencySection.querySelector('select').disabled = true;
+        }
+    }
+
+    // Initial update
+    updateFrequencySection();
+
+    // Update on change
+    smsCheckbox.addEventListener('change', updateFrequencySection);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Sent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            color: #2ecc71; /* Green for success */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        a {
+            text-decoration: none;
+            font-size: 1.1em;
+            color: #3498db; /* Blue for links */
+            padding: 10px 20px;
+            border: 2px solid #3498db; /* Border to match link color */
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        a:hover {
+            background-color: #3498db; /* Background color on hover */
+            color: white; /* Text color on hover */
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            p, a {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Thank You!</h1>
+    <p>Your message has been sent successfully. We will get back to you shortly.</p>
+    <a href="{% url 'help' %}">Back to Help/Support</a>
+</body>
+</html>

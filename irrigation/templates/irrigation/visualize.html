@@ -1,0 +1,365 @@
+{% extends 'irrigation/base.html' %}
+{% load static %}
+
+{% block title %}Moisture Data Visualization{% endblock %}
+
+{% block extra_head %}
+<style>
+    .visualization-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 30px;
+        text-align: center;
+        color: #1f2937;
+        background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        padding: 15px 0;
+    }
+
+    .control-panel {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #059669, #047857);
+        color: white;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+        background: linear-gradient(135deg, #047857, #065f46);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        position: relative;
+        min-height: 500px;
+    }
+
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .status-live {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .current-moisture {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #059669;
+    }
+
+    @media (max-width: 768px) {
+        .visualization-container {
+            padding: 15px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+        }
+
+        .control-panel {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="visualization-container">
+    <h1 class="page-title">Soil Moisture Monitoring</h1>
+
+    <!-- Simple Control Panel -->
+    <div class="control-panel">
+        <div class="status-indicator status-live">
+            <i class="fas fa-circle"></i>
+            Live Moisture Data
+        </div>
+
+        <div class="current-moisture" id="current-moisture">
+            Current: Loading...
+        </div>
+
+        <div class="button-group">
+            <button id="download-chart" class="action-btn btn-secondary">
+                <i class="fas fa-download"></i>
+                Download Chart
+            </button>
+        </div>
+    </div>
+
+    <!-- Chart container -->
+    <div class="chart-container">
+        <canvas id="moistureChart" width="800" height="400"></canvas>
+    </div>
+</div>
+
+<!-- Include Chart.js and date adapter -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script>
+    // Initialize the chart
+    let chart = null;
+    const ctx = document.getElementById('moistureChart').getContext('2d');
+    let updateInterval = null;
+
+    // Function to initialize the chart
+    function initializeChart() {
+        // Destroy the existing chart if it exists
+        if (chart) {
+            chart.destroy();
+            chart = null;
+        }
+
+        // Create a new chart
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Soil Moisture (%)',
+                    data: [],
+                    borderColor: '#059669',
+                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Real-time Soil Moisture Levels',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        color: '#1f2937'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#1f2937',
+                        bodyColor: '#374151',
+                        borderColor: '#059669',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                    },
+                    legend: {
+                        display: true,
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                weight: '600'
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute',
+                            tooltipFormat: 'MMM dd, yyyy HH:mm:ss',
+                            displayFormats: {
+                                minute: 'HH:mm',
+                                hour: 'HH:mm',
+                                day: 'MMM dd'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time',
+                            font: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            color: '#4b5563'
+                        },
+                        grid: {
+                            color: 'rgba(229, 231, 235, 0.8)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Moisture (%)',
+                            font: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            color: '#4b5563'
+                        },
+                        grid: {
+                            color: 'rgba(229, 231, 235, 0.8)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Start real-time updates
+        startRealTimeUpdates();
+    }
+
+    // Function to start real-time updates
+    function startRealTimeUpdates() {
+        // Clear any existing interval
+        if (updateInterval) {
+            clearInterval(updateInterval);
+        }
+
+        // Fetch and update data every 5 seconds
+        updateInterval = setInterval(() => {
+            updateChartData();
+        }, 5000);
+
+        // Fetch data immediately
+        updateChartData();
+    }
+
+    // Function to fetch and update chart data
+    function updateChartData() {
+        fetch('/irrigation/get-sensor-data/?type=moisture')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (chart && data && data.labels && data.values) {
+                    // Update chart data
+                    chart.data.labels = data.labels;
+                    chart.data.datasets[0].data = data.values.map((value, index) => ({
+                        x: data.labels[index],
+                        y: value
+                    }));
+
+                    // Update the chart
+                    chart.update();
+
+                    // Update current moisture display
+                    if (data.values.length > 0) {
+                        const currentMoisture = data.values[data.values.length - 1];
+                        document.getElementById('current-moisture').textContent =
+                            `Current: ${currentMoisture}%`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("Error updating chart:", error);
+                document.getElementById('current-moisture').textContent =
+                    'Current: Error loading data';
+            });
+    }
+
+    // Function to download the chart
+    function downloadChart() {
+        if (chart) {
+            // Convert the chart to a base64 image
+            const image = chart.toBase64Image();
+
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = `moisture-chart-${new Date().toISOString().slice(0, 10)}.png`;
+            link.click();
+        }
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize chart on page load
+        initializeChart();
+
+        // Event listener for download button
+        document.getElementById('download-chart').addEventListener('click', downloadChart);
+    });
+</script>
+{% endblock %}
