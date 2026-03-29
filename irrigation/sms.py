@@ -177,7 +177,7 @@ class SMSService:
             f"Status: {connection_status}",
             f"Time: {eat_time.strftime('%Y-%m-%d %H:%M:%S')}",
             f"━━━━━━━━━━━━━━━━",
-            f"OIL CONDITIONS:",
+            f"SOIL CONDITIONS:",
             f"• Moisture: {moisture if moisture is not None else 'N/A'}%",
             f"• Threshold: {threshold if threshold is not None else 'N/A'}%",
             f"• Irrigation: {irrigation_status}",
